@@ -3,6 +3,7 @@
 """
   Author:  Daniel Smith --<>
   Purpose: Python Port of Mapbox Cheap Ruler (https://github.com/mapbox/cheap-ruler)
+  Credits: @mourner,@anandthakker
   Created: 5/5/2016
 """
 
@@ -30,7 +31,8 @@ class cheapyRuler():
         cos2 = 2 * cos * cos - 1;
         cos3 = 2 * cos * cos2 - cos;
         cos4 = 2 * cos * cos3 - cos2;
-        cos5 = 2 * cos * cos4 - cos3;        
+        cos5 = 2 * cos * cos4 - cos3;
+        #multipliers for converting longitude and latitude degrees into distance (http://1.usa.gov/1Wb1bv7)
         self.kx = m * (111.41513 * cos - 0.09455 * cos3 + 0.00012 * cos5);
         self.ky = m * (111.13209 - 0.56605 * cos2 + 0.0012 * cos4);
         
@@ -57,3 +59,29 @@ class cheapyRuler():
         if bearing > 180:
             bearing -= 360
         return bearing
+    
+    def lineDistance(self,points):
+        '''length of a line'''
+        total = 0
+        i = 0
+        while i < len(points) - 1:
+            total += self.distance(points[i], points[i + 1])
+            i+=1        
+        return total
+    
+    
+    
+    
+    #helper functions
+    def equals(self,a,b):
+        '''Check equality of a point'''
+        if a[0]==b[0] and a[1]==b[1]:
+            return True
+        else:
+            return False
+        
+    def interpolate(self,a,b,t):
+        '''interpolate a new point'''
+        dx = b[0]-a[0]
+        dy = b[1]-a[1]
+        return [a[0]+dx*t, a[1]+dy*t]
