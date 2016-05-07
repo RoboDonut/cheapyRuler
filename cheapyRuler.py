@@ -24,35 +24,35 @@ class cheapyRuler():
 
     #----------------------------------------------------------------------
         
-    def __init__(self,lat,units):
+    def __init__(self,lat=None,units=None):
         """Constructor"""
         m = factors[units]
-        cos = math.cos(lat * math.pi / 180);
-        cos2 = 2 * cos * cos - 1;
-        cos3 = 2 * cos * cos2 - cos;
-        cos4 = 2 * cos * cos3 - cos2;
-        cos5 = 2 * cos * cos4 - cos3;
+        _cos = math.cos(lat * math.pi / 180);
+        cos2 = 2 * _cos * _cos - 1;
+        cos3 = 2 * _cos * cos2 - cos;
+        cos4 = 2 * _cos * cos3 - cos2;
+        cos5 = 2 * _cos * cos4 - cos3;
         #multipliers for converting longitude and latitude degrees into distance (http://1.usa.gov/1Wb1bv7)
-        self.kx = m * (111.41513 * cos - 0.09455 * cos3 + 0.00012 * cos5);
+        self.kx = m * (111.41513 * _cos - 0.09455 * cos3 + 0.00012 * cos5);
         self.ky = m * (111.13209 - 0.56605 * cos2 + 0.0012 * cos4);
         
     
-    def distance(self,a,b):
+    def distance(self,first_point=None,second_point=None):
         ''' Distance between points'''
-        dx = (a[0] - b[0]) * self.kx
-        dy = (a[1] - b[1]) * self.ky
+        dx = (first_point[0] - second_point[0]) * self.kx
+        dy = (first_point[1] - second_point[1]) * self.ky
         return math.sqrt(dx * dx + dy * dy)
     
-    def destination(self,p,dist,bearing):
+    def destination(self,p,distance=None,bearing=None):
         '''new point from point distance and bearing'''
         a = (90 - bearing) * math.pi / 180
-        return [p[0] + math.cos(a) * dist / self.kx,
-            p[1] + math.sin(a) * dist / self.ky]
+        return [p[0] + math.cos(a) * distance / self.kx,
+            p[1] + math.sin(a) * distance / self.ky]
     
-    def bearing(self,a,b):
+    def bearing(self,first_point=None,second_point=None):
         '''bearing to from point to point'''
-        dx = (b[0] - a[0]) * self.kx
-        dy = (b[1] - a[1]) * self.ky
+        dx = (second_point[0] - first_point[0]) * self.kx
+        dy = (second_point[1] - first_point[1]) * self.ky
         if dx == 0 and dy == 0:
             return 0
         bearing = math.atan2(-dy, dx) * 180 / math.pi + 90
@@ -60,7 +60,7 @@ class cheapyRuler():
             bearing -= 360
         return bearing
     
-    def lineDistance(self,points):
+    def lineDistance(self,points=None):
         '''length of a line'''
         total = 0
         i = 0
@@ -73,15 +73,15 @@ class cheapyRuler():
     
     
     #helper functions
-    def equals(self,a,b):
+    def equals(self,first_point=None,second_point=None):
         '''Check equality of a point'''
-        if a[0]==b[0] and a[1]==b[1]:
+        if first_point[0]==second_point[0] and first_point[1]==second_point[1]:
             return True
         else:
             return False
         
-    def interpolate(self,a,b,t):
+    def interpolate(self,first_point=None,second_point=None,t=None):
         '''interpolate a new point'''
-        dx = b[0]-a[0]
-        dy = b[1]-a[1]
-        return [a[0]+dx*t, a[1]+dy*t]
+        dx = second_point[0]-first_point[0]
+        dy = second_point[1]-first_point[1]
+        return [first_point[0]+dx*t, first_point[1]+dy*t]
